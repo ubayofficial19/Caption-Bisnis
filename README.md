@@ -2,17 +2,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fashion Post - Caption & Song Generator</title>
+    <title>Fashion Post - Prompt Generator</title>
     <style>
         /* CSS untuk tampilan yang modern dan responsif */
         :root {
-            --primary-color: #28a745; /* Warna hijau yang lebih segar */
+            --primary-color: #007bff;
             --secondary-color: #6c757d;
             --background-color: #f8f9fa;
             --surface-color: #ffffff;
             --text-color: #212529;
             --border-color: #dee2e6;
-            --success-color: #007bff;
+            --success-color: #28a745;
         }
 
         * {
@@ -86,7 +86,7 @@
         select:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
         }
 
         textarea {
@@ -113,11 +113,15 @@
             border: 1px solid var(--border-color);
         }
 
-        .submit-btn {
-            display: block;
-            width: 100%;
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap; /* Agar tombol bisa turun jika layar sempit */
+        }
+
+        .submit-btn, .secondary-btn {
+            flex: 1 1 200px; /* Tombol bisa membesar dan mengecil */
             padding: 0.85rem;
-            background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 8px;
@@ -127,12 +131,24 @@
             transition: background-color 0.2s, transform 0.1s;
         }
 
+        .submit-btn {
+            background-color: var(--primary-color);
+        }
+
         .submit-btn:hover {
-            background-color: #218838;
+            background-color: #0056b3;
         }
         
-        .submit-btn:active {
+        .submit-btn:active, .secondary-btn:active {
             transform: scale(0.99);
+        }
+        
+        .secondary-btn {
+            background-color: var(--secondary-color);
+        }
+
+        .secondary-btn:hover {
+            background-color: #5a6268;
         }
 
         #results {
@@ -145,63 +161,58 @@
             display: none;
         }
 
-        .result-card {
-            background-color: #f8f9fa;
-            border: 1px solid var(--border-color);
+        .result-box {
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        pre {
+            background-color: #e9ecef;
+            padding: 1rem;
+            padding-top: 3.5rem; /* Memberi ruang untuk tombol di atas */
             border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
             position: relative;
         }
         
-        .result-card h3 {
-            margin-bottom: 1rem;
-            color: var(--primary-color);
-        }
-
-        .result-card p {
-            margin-bottom: 1rem;
-            white-space: pre-wrap; /* Agar baris baru di caption tetap ada */
-        }
-        
-        .result-card .hashtags {
-            color: var(--secondary-color);
-            font-style: italic;
-            word-wrap: break-word;
-        }
-        
-        .result-card .song-recommendation {
-            margin-top: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px dashed var(--border-color);
-        }
-        
-        .song-recommendation strong {
-            display: block;
-            margin-bottom: 0.25rem;
-        }
-        
-        .song-recommendation em {
-             font-size: 0.9rem;
-             color: var(--secondary-color);
-        }
-
-        .copy-btn {
+        .button-container {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .copy-btn, .run-ai-btn {
             padding: 0.4rem 0.8rem;
-            background-color: var(--secondary-color);
             color: white;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.8rem;
+            font-weight: 500;
             transition: background-color 0.2s;
         }
-        
+
+        .copy-btn {
+            background-color: var(--secondary-color);
+        }
         .copy-btn:hover {
             background-color: #5a6268;
+        }
+        
+        .run-ai-btn {
+            background-color: var(--primary-color);
+        }
+        .run-ai-btn:hover {
+            background-color: #0056b3;
         }
 
         /* Responsif untuk layar mobile */
@@ -220,18 +231,23 @@
 
     <div class="container">
         <header>
-            <h1>Fashion Post Generator</h1>
-            <p>Dapatkan ide caption & lagu untuk postingan baju Anda secara instan.</p>
+            <h1>Fashion Post Prompt Generator</h1>
+            <p>Buat prompt AI yang sempurna untuk caption & lagu postingan baju Anda.</p>
         </header>
 
-        <form id="generatorForm">
+        <form id="promptForm">
             <div class="form-group">
                 <label for="brandName">Nama Brand / Usaha Anda</label>
                 <input type="text" id="brandName" placeholder="Contoh: UrbanStyle ID" required>
             </div>
-            
+
+            <div class="form-group">
+                <label for="targetAudience">Siapa Target Audiens Anda?</label>
+                <input type="text" id="targetAudience" placeholder="Contoh: Mahasiswa & pekerja muda, usia 18-28 tahun" required>
+            </div>
+
             <fieldset style="border:1px solid var(--border-color); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
-                <legend style="padding: 0 0.5rem; font-weight: 600;">Informasi Produk Baju (Pilih Salah Satu)</legend>
+                <legend style="padding: 0 0.5rem; font-weight: 600;">Informasi Produk Baju</legend>
                 
                 <div class="form-group">
                     <label for="imageUpload">1. Upload Foto Baju</label>
@@ -250,7 +266,7 @@
 
                 <div class="form-group">
                     <label for="productDescription">3. Deskripsikan Baju Anda</label>
-                    <textarea id="productDescription" rows="4" placeholder="Contoh: Kemeja flanel lengan panjang, motif kotak-kotak warna biru navy dan putih."></textarea>
+                    <textarea id="productDescription" rows="4" placeholder="Contoh: Kemeja flanel lengan panjang, motif kotak-kotak warna biru navy dan putih, bahan katun premium yang lembut."></textarea>
                 </div>
             </fieldset>
 
@@ -263,236 +279,214 @@
                     <option value="Elegan dan Mewah">Elegan dan Mewah</option>
                     <option value="Edgy dan Berani">Edgy dan Berani</option>
                     <option value="Minimalis dan Tenang">Minimalis dan Tenang</option>
-                    <option value="Emosional dan Menyentuh">Emosional dan Menyentuh</option>
                 </select>
             </div>
-
-            <button type="submit" class="submit-btn">Generate Konten!</button>
+            
+            <!-- KONTROL TOMBOL BARU -->
+            <div class="button-group">
+                <button type="submit" class="submit-btn">Buat Prompt!</button>
+                <button type="button" id="generateRandomBtn" class="secondary-btn">Isi Contoh Acak</button>
+            </div>
         </form>
 
         <div id="results" class="hidden">
-            <!-- Hasil akan digenerate oleh JavaScript di sini -->
+            <div class="result-box">
+                <h2>1. Prompt untuk Caption</h2>
+                <pre>
+                    <div class="button-container">
+                        <button class="run-ai-btn" onclick="openInAI('captionPromptOutput')">Buka di Gemini</button>
+                        <button class="copy-btn" onclick="copyToClipboard('captionPromptOutput')">Salin</button>
+                    </div>
+                    <code id="captionPromptOutput"></code>
+                </pre>
+            </div>
+            <div class="result-box">
+                <h2>2. Prompt untuk Rekomendasi Lagu</h2>
+                <pre>
+                    <div class="button-container">
+                        <button class="run-ai-btn" onclick="openInAI('songPromptOutput')">Buka di Gemini</button>
+                        <button class="copy-btn" onclick="copyToClipboard('songPromptOutput')">Salin</button>
+                    </div>
+                    <code id="songPromptOutput"></code>
+                </pre>
+            </div>
         </div>
     </div>
 
     <script>
-    // --- DATABASE TEMPLATE ---
-    const templates = {
-        'Kasual dan Ramah': {
-            captions: [
-                "Outfit check! ✨ {product} dari {brand} ini bener-bener game changer buat daily look kamu. Nyaman, stylish, dan pastinya bikin mood auto-naik!",
-                "Siap-siap jadi pusat perhatian! 😉 {product} terbaru dari {brand} ini pas banget buat nemenin nongkrong atau jalan-jalan santai. Kamu suka warna apa?",
-                "Gaya santai, tapi tetap kece? Bisa banget! Cukup paduin {product} dari {brand} ini dengan jeans favoritmu. Simple, kan?",
-            ],
-            ctas: ["Langsung klik link di bio buat order ya!", "Cek koleksi lengkapnya di profil kami!", "Komen di bawah, kira-kira cocok dipakai ke mana nih?"],
-            songs: [
-                { title: "Sisa Rasa", artist: "Mahalini", reason: "Lagu pop yang easy-listening dan populer, cocok untuk audiens muda." },
-                { title: "As It Was", artist: "Harry Styles", reason: "Vibe-nya yang retro dan catchy pas banget untuk gaya kasual." },
-                { title: "To The Bone", artist: "Pamungkas", reason: "Lagu santai yang sudah sangat dikenal, menciptakan nuansa yang akrab." }
-            ]
-        },
-        'Elegan dan Mewah': {
-            captions: [
-                "Definisi keanggunan sejati. Perkenalkan, {product} eksklusif dari {brand}, dirancang untuk setiap momen berharga Anda.",
-                "Sentuhan kemewahan dalam setiap jahitan. {product} dari {brand} ini memadukan material premium dengan desain yang tak lekang oleh waktu.",
-                "Tingkatkan pesona Anda dengan {product} dari koleksi terbaru {brand}. Sebuah investasi untuk penampilan yang sempurna.",
-            ],
-            ctas: ["Dapatkan koleksi eksklusif ini melalui link di bio.", "Hubungi kami untuk pemesanan pribadi.", "Lihat detail kemewahannya di website kami."],
-            songs: [
-                { title: "Sang Dewi", artist: "Lyodra, Andi Rianto", reason: "Nuansa megah dan vokal yang kuat memberikan kesan mewah." },
-                { title: "Diamonds", artist: "Rihanna", reason: "Judul dan liriknya secara langsung berasosiasi dengan kemewahan." },
-                { title: "Skyfall", artist: "Adele", reason: "Musik orkestra yang sinematik menciptakan atmosfer yang elegan dan premium." }
-            ]
-        },
-        'Ceria dan Enerjik': {
-            captions: [
-                "Warna baru, semangat baru! 🌈 {product} dari {brand} siap bikin hari-harimu makin berwarna dan penuh energi. Let's go!",
-                "Boost your energy! {product} dari {brand} ini punya desain yang fun dan siap nemenin semua aktivitas seru kamu. Siap tampil beda?",
-                "Saatnya bersinar! ✨ Dengan {product} dari {brand}, tunjukkan sisi ceriamu dan sebarkan positive vibes ke sekelilingmu!",
-            ],
-            ctas: ["Shop now and spread the joy!", "Dapetin sekarang juga, jangan sampai kehabisan!", "Tag temanmu yang butuh suntikan semangat!"],
-            songs: [
-                { title: "Hype Boy", artist: "NewJeans", reason: "Beat yang adiktif dan nuansa K-Pop yang ceria sangat cocok untuk konten enerjik." },
-                { title: "Selamat Pagi", artist: "RAN", reason: "Lagu lokal yang optimis dan langsung memberikan semangat pagi." },
-                { title: "Good 4 U", artist: "Olivia Rodrigo", reason: "Beat pop-punk yang powerful memberikan energi yang meledak-ledak." }
-            ]
-        },
-        'Profesional dan Informatif': {
-            captions: [
-                "Tampil profesional tidak pernah semudah ini. {product} dari {brand} kami dibuat dari bahan berkualitas tinggi yang menjamin kenyamanan sepanjang hari kerja Anda.",
-                "Detail Produk: {product}. Produk ini menawarkan durabilitas dan desain yang smart-casual, cocok untuk lingkungan kerja modern.",
-                "Investasi cerdas untuk wardrobe profesional Anda. {product} dari {brand} memberikan keseimbangan sempurna antara fungsi, kenyamanan, dan gaya formal.",
-            ],
-            ctas: ["Lihat spesifikasi lengkap di website kami.", "Tersedia dalam berbagai ukuran. Cek link di bio.", "Shop our workwear collection now."],
-            songs: [
-                { title: "Feeling Good", artist: "Michael Bublé", reason: "Lagu yang sophisticated dan memberikan rasa percaya diri." },
-                { title: "Corporate", artist: "Kinematic", reason: "Musik instrumental yang modern dan tidak mengganggu, cocok untuk presentasi produk." },
-                { title: "Higher", artist: "Tems", reason: "Vokal yang soulful dengan beat yang tenang memberikan kesan profesional dan fokus." }
-            ]
-        },
-        'Edgy dan Berani': {
-            captions: [
-                "Rules are made to be broken. Tunjukkan sisi pemberontakmu dengan {product} dari {brand}. Dare to wear it?",
-                "Bukan untuk semua orang. {product} dari {brand} ini dirancang bagi mereka yang berani tampil beda dan mendobrak batasan.",
-                "Hitam bukan sekadar warna, tapi sebuah statement. {product} dari {brand} ini adalah kanvas untuk kepribadianmu yang kuat.",
-            ],
-            ctas: ["Unleash your inner rebel. Shop now.", "Limited stock. Get yours or regret later.", "Join the dark side. Link in bio."],
-            songs: [
-                { title: "Buka Pintu", artist: "Reality Club", reason: "Nuansa rock alternatif yang unik dan lirik yang 'gelap' cocok dengan vibe edgy." },
-                { title: "Bad Guy", artist: "Billie Eilish", reason: "Beat yang minimalis namun 'dark' dan ikonik sangat identik dengan gaya edgy." },
-                { title: "Do I Wanna Know?", artist: "Arctic Monkeys", reason: "Riff gitar yang ikonik dan nuansa rock yang 'cool' memberikan kesan pemberontak." }
-            ]
-        },
-        'Minimalis dan Tenang': {
-            captions: [
-                "Less is more. Temukan keindahan dalam kesederhanaan dengan {product} dari {brand}. Esensi dari gaya yang tenang.",
-                "Ketenangan dalam setiap helai. {product} dari {brand} ini menawarkan kenyamanan maksimal dengan palet warna netral yang menenangkan.",
-                "Gaya yang bersih, pikiran yang jernih. {product} dari {brand} adalah pilihan tepat untuk Anda yang menghargai desain minimalis dan fungsional.",
-            ],
-            ctas: ["Discover our essentials collection.", "Sempurnakan gaya minimalis Anda. Klik link di bio.", "Tersedia dalam warna-warna bumi."],
-            songs: [
-                { title: "Rehat", artist: "Kunto Aji", reason: "Lirik yang menenangkan dan musik yang syahdu sangat cocok dengan tema minimalis." },
-                { title: "Saturn", artist: "SZA", reason: "Alunan musik yang dreamy dan vokal yang lembut menciptakan suasana tenang." },
-                { title: "Location", artist: "Khalid", reason: "Beat R&B yang laid-back dan modern memberikan kesan santai dan 'clean'." }
-            ]
-        },
-        'Emosional dan Menyentuh': {
-            captions: [
-                "Pakaian bukan hanya tentang apa yang kita kenakan, tapi tentang apa yang kita rasakan. {product} dari {brand} ini dirancang untuk terasa seperti pelukan hangat, sebuah pengingat lembut bahwa Anda layak merasa nyaman menjadi diri sendiri.",
-                "Setiap momen dalam hidup adalah sebuah cerita. Biarkan {product} dari {brand} ini menjadi bagian dari bab terindah dalam kisahmu. Kenakan saat tertawa, saat merenung, saat meraih mimpi. Ciptakan kenangan yang akan selalu melekat.",
-                "Di tengah dunia yang serba cepat, ada kekuatan dalam kelembutan. {product} dari {brand} ini adalah undangan untuk berhenti sejenak, bernapas, dan merasakan. Rasakan setiap detailnya, dan biarkan ia menguatkan versi terbaik dari dirimu.",
-            ],
-            ctas: ["Temukan potongan yang mengerti Anda. Klik link di bio.", "Jadikan ini bagian dari ceritamu. Pesan sekarang.", "Bagikan satu kata tentang perasaanmu hari ini di kolom komentar."],
-            songs: [
-                { title: "Manusia Kuat", artist: "Tulus", reason: "Liriknya yang memberdayakan memberikan kekuatan dan sentuhan emosional yang mendalam." },
-                { title: "Bertaut", artist: "Nadin Amizah", reason: "Melodi dan liriknya yang puitis menciptakan suasana haru dan koneksi batin." },
-                { title: "Easy On Me", artist: "Adele", reason: "Lagu balada yang kuat tentang kerapuhan dan self-love, sangat menyentuh." }
-            ]
-        }
-    };
+        // JavaScript untuk fungsionalitas halaman
+        document.getElementById('promptForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Mencegah form mengirim data dan me-reload halaman
 
-    // --- FUNGSI UTAMA ---
-    document.getElementById('generatorForm').addEventListener('submit', function(event) {
-        event.preventDefault();
+            // 1. Mengambil semua nilai dari input
+            const brandName = document.getElementById('brandName').value.trim();
+            const targetAudience = document.getElementById('targetAudience').value.trim();
+            const productLink = document.getElementById('productLink').value.trim();
+            const productDescription = document.getElementById('productDescription').value.trim();
+            const imageUploaded = document.getElementById('imageUpload').files.length > 0;
+            const tone = document.getElementById('tone').value;
 
-        const brandName = document.getElementById('brandName').value.trim();
-        const tone = document.getElementById('tone').value;
-        const resultsContainer = document.getElementById('results');
-        
-        let productDescription = document.getElementById('productDescription').value.trim();
-        const productLink = document.getElementById('productLink').value.trim();
-        const imageUploaded = document.getElementById('imageUpload').files.length > 0;
-
-        let effectiveDescription = productDescription;
-
-        if (!effectiveDescription && productLink) {
-            effectiveDescription = `produk dari link ini: ${productLink}`;
-        } else if (!effectiveDescription && !productLink && imageUploaded) {
-            effectiveDescription = `produk yang terlihat pada gambar yang diunggah`;
-        }
-        
-        if (!effectiveDescription) {
-            alert('Harap isi salah satu informasi produk: Deskripsi, Link, atau Foto.');
-            return;
-        }
-
-        const selectedTemplate = templates[tone];
-        if (!selectedTemplate) return;
-
-        resultsContainer.innerHTML = '';
-        
-        for (let i = 0; i < 2; i++) {
-            const captionTmpl = getRandomItem(selectedTemplate.captions);
-            const ctaTmpl = getRandomItem(selectedTemplate.ctas);
-            const songTmpl = getRandomItem(selectedTemplate.songs);
-
-            let finalCaption = captionTmpl.replace(/{product}/g, effectiveDescription).replace(/{brand}/g, brandName);
-            finalCaption += `\n\n${ctaTmpl}`;
-            
-            const finalHashtags = generateHashtags(brandName, effectiveDescription);
-
-            const card = document.createElement('div');
-            card.className = 'result-card';
-            
-            const uniqueId = `caption-${i}`;
-            card.innerHTML = `
-                <button class="copy-btn" onclick="copyResultToClipboard('${uniqueId}')">Salin</button>
-                <h3>Opsi Konten #${i + 1}</h3>
-                <div id="${uniqueId}">
-                    <p>${finalCaption}</p>
-                    <p class="hashtags">${finalHashtags}</p>
-                </div>
-                <div class="song-recommendation">
-                    <strong>Rekomendasi Lagu: ${songTmpl.title} - ${songTmpl.artist}</strong>
-                    <em>Alasan: ${songTmpl.reason}</em>
-                </div>
-            `;
-            
-            resultsContainer.appendChild(card);
-        }
-
-        resultsContainer.classList.remove('hidden');
-        resultsContainer.scrollIntoView({ behavior: 'smooth' });
-    });
-
-    // --- FUNGSI BANTUAN ---
-
-    document.getElementById('imageUpload').addEventListener('change', function(event) {
-        const previewContainer = document.getElementById('imagePreview');
-        previewContainer.innerHTML = '';
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                previewContainer.appendChild(img);
+            // Validasi dasar: setidaknya salah satu info produk harus diisi
+            if (!productLink && !productDescription && !imageUploaded) {
+                alert('Harap isi salah satu informasi produk: Upload foto, Link produk, atau Deskripsi.');
+                return;
             }
-            reader.readAsDataURL(file);
-        }
-    });
 
-    function getRandomItem(arr) {
-        return arr[Math.floor(Math.random() * arr.length)];
-    }
+            // 2. Membangun bagian informasi produk untuk prompt
+            let productInfoText = '';
+            if (productLink) {
+                productInfoText = `Produk ini dapat dilihat detailnya pada link berikut: ${productLink}. Tolong analisis informasi dari link tersebut (nama produk, bahan, harga jika ada) untuk memperkaya caption.`;
+            } else if (productDescription) {
+                productInfoText = `Berikut adalah deskripsi produknya: "${productDescription}".`;
+            } else if (imageUploaded) {
+                productInfoText = `Produknya adalah baju yang ada di dalam gambar yang diunggah. Deskripsikan secara visual apa yang kamu lihat (warna, model, gaya, motif jika ada) dan gunakan deskripsi itu sebagai dasar caption.`;
+            }
 
-    function generateHashtags(brand, desc) {
-        let tags = new Set();
-        tags.add(`#${brand.replace(/\s+/g, '')}`);
-        
-        const words = desc.toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/);
-        const keywords = ['kemeja', 'kaos', 'baju', 'dress', 'flanel', 'katun', 'ootd', 'fashion', 'style', 'outfit', 'link', 'gambar'];
-        
-        words.forEach(word => {
-            if (keywords.includes(word) && tags.size < 6) {
-                tags.add(`#${word}`);
+            // 3. Membuat template prompt untuk caption
+            const captionPrompt = `Anda adalah seorang social media manager profesional untuk sebuah brand fashion.
+Tugas Anda adalah membuat 3 opsi caption menarik untuk postingan Instagram.
+
+Berikut adalah detailnya:
+- Nama Brand: ${brandName}
+- Target Audiens: ${targetAudience}
+- Informasi Produk: ${productInfoText}
+- Gaya Bahasa/Vibe yang Diinginkan: ${tone}
+
+Instruksi Pembuatan Caption:
+1. Buat 3 (tiga) alternatif caption yang berbeda.
+2. Setiap caption harus memiliki hook (kalimat pembuka) yang kuat untuk menarik perhatian.
+3. Sertakan call-to-action (CTA) yang jelas di akhir setiap caption (Contoh: "Klik link di bio!", "Shop now!", "Komen di bawah!").
+4. Tambahkan 5-7 hashtag yang relevan dan spesifik di akhir setiap caption. Hashtag harus mencakup nama brand, jenis produk, dan audiens.
+5. Pastikan gaya bahasa sesuai dengan vibe "${tone}" yang diminta.`;
+
+            // 4. Membuat template prompt untuk rekomendasi lagu
+            const songPrompt = `Anda adalah seorang music curator yang ahli dalam memilih lagu untuk konten media sosial.
+Tugas Anda adalah merekomendasikan 3 lagu yang cocok untuk video/reels Instagram yang mempromosikan produk fashion.
+
+Berikut adalah konteksnya:
+- Brand: ${brandName}
+- Target Audiens: ${targetAudience}
+- Deskripsi Produk: ${productDescription || "Baju fashion yang stylish (detail ada pada link/gambar yang disediakan di prompt lain)."}
+- Vibe yang Diinginkan: ${tone}
+
+Instruksi Pemilihan Lagu:
+1. Berikan 3 (tiga) rekomendasi lagu.
+2. Untuk setiap lagu, sebutkan Judul Lagu dan Nama Artisnya.
+3. Berikan alasan singkat (1-2 kalimat) mengapa lagu tersebut cocok dengan produk dan vibe yang diinginkan.
+4. Pilih lagu yang sedang tren atau memiliki nuansa yang pas, bisa dari artis Indonesia maupun internasional.`;
+
+            // 5. Menampilkan hasil prompt di halaman
+            document.getElementById('captionPromptOutput').textContent = captionPrompt.trim();
+            document.getElementById('songPromptOutput').textContent = songPrompt.trim();
+            document.getElementById('results').classList.remove('hidden');
+            
+            // Scroll ke hasil agar terlihat
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Fungsi untuk menampilkan preview gambar yang diupload
+        document.getElementById('imageUpload').addEventListener('change', function(event) {
+            const previewContainer = document.getElementById('imagePreview');
+            previewContainer.innerHTML = ''; // Kosongkan preview sebelumnya
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    previewContainer.appendChild(img);
+                }
+                reader.readAsDataURL(file);
             }
         });
-        
-        tags.add('#OOTDIndonesia');
-        tags.add('#LocalBrand');
-        
-        return Array.from(tags).join(' ');
-    }
 
-    function copyResultToClipboard(elementId) {
-        const element = document.getElementById(elementId);
-        const textToCopy = element.innerText || element.textContent;
-        
-        navigator.clipboard.writeText(textToCopy.trim()).then(() => {
-            const button = event.target;
-            const originalText = button.textContent;
-            button.textContent = 'Disalin!';
-            button.style.backgroundColor = 'var(--success-color)';
+        // Fungsi untuk menyalin teks ke clipboard
+        function copyToClipboard(elementId) {
+            const textToCopy = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                // Beri feedback ke user bahwa teks berhasil disalin
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Disalin!';
+                button.style.backgroundColor = 'var(--success-color)';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.backgroundColor = 'var(--secondary-color)';
+                }, 2000);
+
+            }).catch(err => {
+                console.error('Gagal menyalin teks: ', err);
+                alert('Gagal menyalin teks.');
+            });
+        }
+
+        /**
+         * FUNGSI BARU: Membuka prompt di Google Gemini
+         * @param {string} elementId - ID dari elemen <code> yang berisi teks prompt.
+         */
+        function openInAI(elementId) {
+            // 1. Ambil teks prompt dari elemen yang sesuai.
+            const promptText = document.getElementById(elementId).textContent;
             
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.backgroundColor = 'var(--secondary-color)';
-            }, 2000);
-        }).catch(err => {
-            console.error('Gagal menyalin: ', err);
-        });
-    }
+            // 2. Encode teks prompt agar aman digunakan dalam URL.
+            const encodedPrompt = encodeURIComponent(promptText);
+            
+            // 3. Buat URL untuk Google Gemini dengan prompt yang sudah di-encode.
+            const geminiUrl = `https://gemini.google.com/app?prompt=${encodedPrompt}`;
+            
+            // 4. Buka URL tersebut di tab browser baru.
+            window.open(geminiUrl, '_blank');
+        }
+
+        // --- FITUR BARU: GENERATE CONTOH ACAK ---
+
+        /**
+         * Fungsi untuk mengisi form dengan data acak dan men-trigger submit.
+         */
+        function generateRandomExample() {
+            // 1. Data contoh untuk diisi secara acak
+            const sampleBrands = ["Gaya Nusantara", "Urban Chic ID", "Kain Tenun Co.", "Streetwear Jakarta", "Ethereal Wear"];
+            const sampleAudiences = ["Anak muda Gen Z yang suka fashion lokal & edgy", "Wanita karir usia 25-40 tahun yang elegan", "Pecinta budaya dan kain tradisional", "Mahasiswa yang aktif dan dinamis", "Remaja yang mengikuti tren Korea"];
+            const sampleDescriptions = [
+                "T-shirt oversized dengan sablon grafis peta Indonesia di bagian belakang, bahan katun combed 24s yang adem dan nyaman.",
+                "Blazer wanita model crop top warna beige, bahan linen premium, dilengkapi kancing batok kelapa, cocok untuk acara formal dan kasual.",
+                "Kemeja batik lengan pendek dengan motif parang modern, kombinasi warna sogan dan indigo, bahan katun primisima yang halus.",
+                "Hoodie dengan tali serut tebal dan saku kanguru, warna hitam pekat, logo brand minimalis di dada kiri, bahan fleece tebal.",
+                "Rok mini model plisket (pleated skirt) warna pastel ala Korea, bahan high-quality polyester yang tidak mudah kusut."
+            ];
+            const toneOptions = document.getElementById('tone').options;
+
+            // 2. Fungsi bantuan untuk mendapatkan item acak dari sebuah array
+            const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+            // 3. Mengambil elemen-elemen form
+            const brandNameInput = document.getElementById('brandName');
+            const audienceInput = document.getElementById('targetAudience');
+            const descriptionInput = document.getElementById('productDescription');
+            const toneSelect = document.getElementById('tone');
+            const productLinkInput = document.getElementById('productLink');
+            const imageUploadInput = document.getElementById('imageUpload');
+            const imagePreview = document.getElementById('imagePreview');
+
+            // 4. Mengosongkan input info produk lainnya untuk memastikan hanya deskripsi yang dipakai
+            productLinkInput.value = '';
+            imageUploadInput.value = ''; // Mengosongkan file input
+            imagePreview.innerHTML = ''; // Menghapus preview gambar
+
+            // 5. Mengisi form dengan data acak
+            brandNameInput.value = getRandomItem(sampleBrands);
+            audienceInput.value = getRandomItem(sampleAudiences);
+            descriptionInput.value = getRandomItem(sampleDescriptions);
+            toneSelect.selectedIndex = Math.floor(Math.random() * toneOptions.length);
+            
+            // 6. Memicu (trigger) event 'submit' pada form untuk menjalankan logika pembuatan prompt
+            document.getElementById('promptForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+        }
+
+        // Menambahkan event listener ke tombol baru
+        document.getElementById('generateRandomBtn').addEventListener('click', generateRandomExample);
+
     </script>
 
 </body>
